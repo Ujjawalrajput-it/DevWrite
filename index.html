@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>DevWrite - Developer Blog Platform</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+   <div class="container">
+      <!-- Header -->
+      <header class="header">
+         <h1 class="logo">DevWrite</h1>
+         <p class="tagline">// Where developers share their thoughts</p>
+      </header>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+         <div class="status-item">
+            <div class="status-dot"></div>
+            <span>Database: <span id="dbStatus">Firebase Firestore</span></span>
+         </div>
+         <div class="status-item">
+            <span>Posts: <span id="postCount">0</span></span>
+         </div>
+         <div class="status-item">
+            <span>Authors: <span id="authorCount">0</span></span>
+         </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="nav-tabs">
+         <button class="tab-btn active" onclick="switchTab('posts')">📚 Posts</button>
+         <button class="tab-btn" onclick="switchTab('write')">✍️ Write</button>
+         <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
+      </nav>
+
+      <!-- Posts Section -->
+      <section id="posts-section" class="content-section active">
+         <div class="controls">
+            <div class="search-box">
+               <input type="text" class="search-input" id="searchInput" placeholder="Search posts, authors, tags...">
+               <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary" onclick="switchTab('write')">+ New Post</button>
+         </div>
+
+         <div id="blogGrid" class="blog-grid"></div>
+
+         <div id="emptyState" class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>No posts yet</h3>
+            <p>Start by creating your first developer blog post!</p>
+            <button class="btn btn-primary" onclick="switchTab('write')" style="margin-top: 20px;">Write Your First
+               Post</button>
+         </div>
+      </section>
+
+      <!-- Write Section -->
+      <section id="write-section" class="content-section">
+         <div class="terminal-form">
+            <div class="terminal-header">
+               <div class="terminal-dots">
+                  <div class="terminal-dot"></div>
+                  <div class="terminal-dot"></div>
+                  <div class="terminal-dot"></div>
+               </div>
+               <span class="terminal-title" id="formTitle">create_new_post.js</span>
+            </div>
+            <div class="terminal-body">
+               <form id="postForm">
+                  <div class="form-group">
+                     <label class="form-label" for="title">title</label>
+                     <input type="text" id="title" class="form-input" placeholder="Enter your post title..." required>
+                  </div>
+                  <div class="form-group">
+                     <label class="form-label" for="author">author</label>
+                     <input type="text" id="author" class="form-input" placeholder="Your name..." required>
+                  </div>
+                  <div class="form-group">
+                     <label class="form-label" for="tags">tags</label>
+                     <input type="text" id="tags" class="form-input"
+                        placeholder="javascript, react, nodejs (comma separated)">
+                  </div>
+                  <div class="form-group">
+                     <label class="form-label" for="content">content</label>
+                     <textarea id="content" class="form-input form-textarea"
+                        placeholder="Write your blog post content here..." required></textarea>
+                  </div>
+                  <div class="btn-group">
+                     <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+                     <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span id="submitText">Publish Post</span>
+                        <span id="submitLoading" class="loading" style="display: none;"></span>
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </section>
+
+      <template id="blog-card-template">
+         <div class="blog-card">
+            <div class="card-header">
+               <h3 class="card-title" data-field="title"></h3>
+               <div class="card-meta">
+                  <span data-field="author"></span>
+                  <span data-field="timeAgo"></span>
+               </div>
+            </div>
+            <div class="card-body">
+               <div class="card-content" data-field="content"></div>
+               <div class="card-tags" data-field="tags"></div>
+            </div>
+            <div class="card-footer">
+               <div class="card-actions">
+                  <button class="btn btn-secondary btn-sm edit-btn">Edit</button>
+                  <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+               </div>
+               <small class="card-date" data-field="date"></small>
+            </div>
+         </div>
+      </template>
+
+      <!-- Analytics Section -->
+      <section id="analytics-section" class="content-section">
+         <div class="terminal-form">
+            <div class="terminal-header">
+               <div class="terminal-dots">
+                  <div class="terminal-dot"></div>
+                  <div class="terminal-dot"></div>
+                  <div class="terminal-dot"></div>
+               </div>
+               <span class="terminal-title">analytics_dashboard.js</span>
+            </div>
+            <div class="terminal-body">
+               <div id="analyticsContent">
+                  <div style="text-align: center; padding: 40px; color: var(--gray);">
+                     <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
+                     <h3>Analytics Dashboard</h3>
+                     <p>Track your posts performance and engagement!</p>
+                     <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                        <div
+                           style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                           <div style="text-align: center;">
+                              <div style="font-size: 2rem; color: var(--primary);" id="totalViews">0</div>
+                              <div style="color: var(--gray);">Total Views</div>
+                           </div>
+                           <div style="text-align: center;">
+                              <div style="font-size: 2rem; color: var(--secondary);" id="avgReadTime">0min</div>
+                              <div style="color: var(--gray);">Avg Read Time</div>
+                           </div>
+                           <div style="text-align: center;">
+                              <div style="font-size: 2rem; color: var(--accent);" id="popularTag">N/A</div>
+                              <div style="color: var(--gray);">Popular Tag</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+   </div>
+
+   <!-- Notification Container -->
+   <div id="notificationContainer"></div>
+   <script type="module">
+      import './firebase-config.js';
+      import './app.js';
+   </script>
+</body>
+
+</html>
